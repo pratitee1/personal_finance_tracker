@@ -45,7 +45,7 @@ def classify_receipt(lines: List[str]) -> ReceiptSummary:
         "clothing, electronics, furniture, or other. If you cannot determine the category,"
         " use 'other'. Include a confidence_score out of 100 for your extraction of each item."
         "At the end include a confidence_score_ocr out of 100 for your confidence in the correctness"
-        "of OCR extracted input."
+        "of OCR extracted input. Remeber to give the date as DD-MM-YYYY format."
     )
     try:
         response = client.beta.chat.completions.parse(

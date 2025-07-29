@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 .mypy_cache/
 .ruff_cache/
+*.mako
 
 .Python
 build/
@@ -11,6 +12,7 @@ dist/
 var/
 wheels/
 share/python-wheels/
+versions/
 
 htmlcov/
 .tox/
