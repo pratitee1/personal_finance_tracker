@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from api.routes import upload_receipt
+from api.routes import rag_qa
 
 app = FastAPI()
 
@@ -22,5 +23,6 @@ async def log_requests(request: Request, call_next):
     return response
 
 app.include_router(upload_receipt.router, prefix="/upload")
+app.include_router(rag_qa.router, prefix="/rag")
 
 

@@ -3,6 +3,7 @@ from db.models.receipt import Receipt
 from db.models.line_item import LineItem
 from datetime import datetime
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 def persist_receipt(json_data, lines, user_id=1):
     db = SessionLocal()
     try:
@@ -18,6 +19,8 @@ def persist_receipt(json_data, lines, user_id=1):
             date=datetime.strptime(json_data.date, "%d-%m-%Y").date() if json_data.date else None,
             raw_text="\n".join(lines),
         )
+        db.add(receipt)
+        db.flush()
         for item in json_data.items:
             line_item = LineItem(
                 name=item.name,
@@ -29,9 +32,8 @@ def persist_receipt(json_data, lines, user_id=1):
                 receipt=receipt,
             )
             db.add(line_item)
-        db.add(receipt)
         db.commit()
-        db.refresh(receipt)
+        receipt = db.query(Receipt).options(joinedload(Receipt.line_items)).filter(Receipt.id == receipt.id).one()
         return receipt
     except Exception as e:
         db.rollback()
