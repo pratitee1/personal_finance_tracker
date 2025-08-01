@@ -10,8 +10,12 @@ class LineItem(BaseModel):
     quantity: Optional[conint(ge=0)] = None
     price_per_unit: Optional[confloat(ge=0.0)] = None
     total_price: Optional[confloat(ge=0.0)]    = None
-    category: Literal["essential groceries", "feel good groceries", "clothing", 
-                      "electronics", "furniture", "other"]
+    category: Literal["frozen/prepared food essential", "frozen/prepared food indulgence","savory snacks",  "desserts", "pantry staples",
+                       "other pantry indulgence","beverages","alcohol","household cleaning supplies","laundry","toiletries essentials",
+                       "toiletries indulgence","cosmetics and skin/hair/body care essentials","cosmetics and skin/hair/body care indulgence",
+                       "over-the-counter medicine", "vitamins and supplements","dining/restaurants","transportation","utilities/housing",
+                       "education/professional", "entertainment","travel and accommodation","gifts and donation","subscription and membership",
+                       "other"]
     confidence_score: int
 
 class ReceiptSummary(BaseModel):

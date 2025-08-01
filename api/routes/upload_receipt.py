@@ -3,11 +3,12 @@ from loguru import logger
 from ingestion.ocr.easyocr_wrapper import extract_lines
 from ingestion.ocr.llm_classifier_wrapper import classify_receipt
 import tempfile
-import os
+import os, json
 from dotenv import load_dotenv
 load_dotenv()
 from api.services.receipt_service import persist_receipt
 from api.services.embedding_service import EmbeddingService
+from pathlib import Path
 
 router = APIRouter()
 
@@ -35,4 +36,12 @@ async def upload_receipt(file: UploadFile = File(...)):
         logger.info(f"Embedded receipt {receipt.id} into vector DB")
     except Exception as e:
         logger.error(f"Failed to embed receipt {receipt.id}: {e}")
+    if os.getenv("MODEL_VALIDATION") == "1":
+        out_dir = Path("validation/receipt_val_data/predictions")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        stem = Path(file.filename).stem
+        out_file = out_dir / f"{stem}.json"
+        items_only = [item.model_dump() for item in json_data.items]
+        with out_file.open("w", encoding="utf-8") as fp:
+            json.dump(items_only, fp, indent=2, ensure_ascii=False)
     return {"filename": file.filename, "receipt_id": receipt.id, "json_data": json_data}
