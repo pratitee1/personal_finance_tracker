@@ -4,8 +4,8 @@ import json, re
 from pathlib import Path
 
 from sklearn.metrics import (precision_recall_fscore_support, accuracy_score, mean_absolute_error)
-GT_DIR   = Path("validation/receipt_val_data/ground_truth_json")
-PRED_DIR = Path("validation/receipt_val_data/predictions")
+GT_DIR   = Path("validation/receipt_val_data/ground_truth_outdated")
+PRED_DIR = Path("validation/receipt_val_data/predictions_receipts")
 
 y_true_names = []
 y_pred_names = []
@@ -26,14 +26,20 @@ for gt_path in sorted(GT_DIR.glob("*.json")):
     stem      = gt_path.stem
     pred_path = PRED_DIR / f"{stem}.json"
     if not pred_path.exists():
+        print(pred_path)
         print(f"Skipping {stem}: no prediction file found.")
         continue
     with gt_path.open("r", encoding="utf-8") as f:
         gt_items = json.load(f)
     with pred_path.open("r", encoding="utf-8") as f:
-        pred_items = json.load(f)
-    n = min(len(gt_items), len(pred_items))
-    for i in range(n):
+        pred_complete = json.load(f)
+    ocr_confidence = pred_complete.get("confidence_score_ocr", 0)
+    pred_items = pred_complete.get("items", [])
+    if ocr_confidence < 80 or len(pred_items) != len(gt_items):
+        print(f"Skipping {stem}: OCR confidence {ocr_confidence} is below "
+              f"threshold or number of line items not same")
+        continue
+    for i in range(len(gt_items)):
         gt   = gt_items[i]
         pred = pred_items[i]
         y_true_names.append(gt["item"])
@@ -46,16 +52,12 @@ for gt_path in sorted(GT_DIR.glob("*.json")):
         y_pred_qty.append(pred["quantity"])
         y_true_tot.append(gt["total_price"])
         y_pred_tot.append(pred["total_price"])
-precision, recall, f1, _ = precision_recall_fscore_support(
-    y_true_names, y_pred_names, average="micro"
-)
+
 cat_acc = accuracy_score(y_true_cats, y_pred_cats)
 ppu_mae = mean_absolute_error(y_true_ppu, y_pred_ppu)
 qty_mae = mean_absolute_error(y_true_qty, y_pred_qty)
 tot_mae = mean_absolute_error(y_true_tot, y_pred_tot)
-print("ITEM NAME   →  precision: {:.3f}, recall: {:.3f},  F1 (micro): {:.3f}".format(
-    precision, recall, f1
-))
+
 print("CATEGORY    →  accuracy: {:.3f}".format(cat_acc))
 print("PRICE/UNIT  →  MAE: {:.3f}".format(ppu_mae))
 print("QUANTITY    →  MAE: {:.3f}".format(qty_mae))
