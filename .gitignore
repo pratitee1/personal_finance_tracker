@@ -47,3 +47,6 @@ chroma_db/
 sitecustomize.py
 receipt_val_data/
 rag_val_data/
+.dockerignore
+pgdata/
+chroma_data/

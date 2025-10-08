@@ -45,6 +45,7 @@ tqdm==4.66.4
 regex==2024.5.15
 python-dotenv==1.0.1
 loguru==0.7.2
+pysqlite3-binary==0.5.2.post3
 
 # Optional: Differential Privacy
 opacus==1.4.0
