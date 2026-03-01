@@ -10,7 +10,7 @@ load_dotenv()
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 st.set_page_config(page_title="Personal Finance Tracker", layout="wide")
 
-st.title("💰 Personal Finance Tracker")
+st.title("Personal Finance Tracker")
 
 # Sidebar for navigation
 with st.sidebar:
@@ -19,7 +19,7 @@ with st.sidebar:
 
 # Chat Interface
 if page == "Chat":
-    st.header("💬 Ask Questions About Your Finances")
+    st.header("Ask Questions About Your Finances")
     
     # Initialize chat history
     if "messages" not in st.session_state:
@@ -70,7 +70,7 @@ if page == "Chat":
 
 # Upload Receipts Interface
 elif page == "Upload Receipts":
-    st.header("📸 Upload Receipts")
+    st.header(" Upload Receipts")
     
     col1, col2 = st.columns(2)
     

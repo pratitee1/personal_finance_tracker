@@ -54,8 +54,5 @@ pysqlite3-binary==0.5.2.post3
 opacus==1.4.0
 
 
-
-
-# Extra
-#postgresql
-#datasets
+#testing
+pytest==7.4.0

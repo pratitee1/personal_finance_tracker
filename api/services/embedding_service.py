@@ -7,7 +7,7 @@ from datetime import date, datetime, time
 class EmbeddingService:
     def __init__(self):
         self.model = SentenceTransformer(os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2"))
-        self.client = chromadb.PersistentClient(path=os.getenv("CHROMA_PERSIST_DIR", "./chroma_db"))
+        self.client = chromadb.PersistentClient(path=os.getenv("CHROMA_PERSIST_DIR", "./chroma_db1"))
         self.collection = self.client.get_or_create_collection(name="receipts")
 
     def embed_receipt(self, receipt):
