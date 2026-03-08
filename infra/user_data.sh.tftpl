@@ -1,0 +1,73 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y docker
+
+systemctl enable docker
+systemctl start docker
+
+mkdir -p /usr/local/lib/docker/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.40.0/docker-compose-linux-x86_64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+mkdir -p /opt/pft
+cd /opt/pft
+
+cat > /opt/pft/.env <<'EOF'
+${env_content}
+EOF
+
+cat > /opt/pft/docker-compose.yml <<'EOF'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: $${POSTGRES_USER}
+      POSTGRES_PASSWORD: $${POSTGRES_PASSWORD}
+      POSTGRES_DB: $${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: pratiteep/pft-api:latest
+    container_name: api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${api_port}:8000"
+    command: sh -c "alembic upgrade head && uvicorn api.main:app --host 0.0.0.0 --port 8000"
+
+  streamlit:
+    image: pratiteep/pft-frontend:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - api
+    ports:
+      - "${streamlit_port}:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+
+volumes:
+  pgdata:
+EOF
+
+cd /opt/pft
+docker compose pull
+docker compose up -d
+
+# Optional cleanup to save disk
+#docker image prune -af || true
