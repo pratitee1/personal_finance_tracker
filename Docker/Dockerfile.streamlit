@@ -7,10 +7,9 @@ RUN apt-get update && \
       build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY frontend-requirements.txt .
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install -r requirements.txt && \
-    pip install streamlit==1.28.0 requests==2.31.0
+    pip install -r frontend-requirements.txt
 
 RUN apt-get purge -y --auto-remove build-essential && \
     rm -rf /var/lib/apt/lists/*

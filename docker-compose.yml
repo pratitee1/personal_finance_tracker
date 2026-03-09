@@ -20,7 +20,8 @@ services:
     build:
       context: .
       dockerfile: Docker/Dockerfile.api
-    image: personal_finance_tracker_api:latest
+    image: pratiteep/pft-api:latest
+    container_name: api
     restart: unless-stopped
     env_file:
       - .env
@@ -37,7 +38,7 @@ services:
     build:
       context: .
       dockerfile: Docker/Dockerfile.streamlit
-    image: personal_finance_tracker_frontend:latest
+    image: pratiteep/pft-frontend:latest
     restart: unless-stopped
     env_file:
       - .env

@@ -50,3 +50,13 @@ rag_val_data/
 .dockerignore
 pgdata/
 chroma_data/
+terraform.tfvars
+.terraform/
+.terraform.lock.hcl
+tf.plan
+tfplan.txt
+terraform.tfstate.backup
+terraform.tfstate
+*.tfstate
+*.tfstate.*
+pft-secrets.yaml
