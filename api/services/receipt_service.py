@@ -4,7 +4,9 @@ from db.models.line_item import LineItem
 from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
-def persist_receipt(json_data, lines, user_id=1):
+
+
+def persist_receipt(json_data, lines, user_id: int):
     db = SessionLocal()
     try:
         receipt = Receipt(

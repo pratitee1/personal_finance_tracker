@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from api.services.rag_service import RAGService
+from api.dependencies.auth import get_current_user
+from db.models.user import User
 from datetime import date
 router = APIRouter()
 rag_svc = RAGService()
 
 class RAGRequest(BaseModel):
     question: str
-    user_id: int
     start_date: date | None = None
     end_date:   date | None = None
 
@@ -17,13 +18,20 @@ class RAGResponse(BaseModel):
     source_chunks: list[str]
 
 @router.post("/Question", response_model=RAGResponse)
-async def raq_qa(request: RAGRequest):
+async def raq_qa(
+    request: RAGRequest,
+    current_user: User = Depends(get_current_user),
+):
     question = request.question
-    user_id  = request.user_id
     start_date  = request.start_date
     end_date    = request.end_date
     try:
-        answer, chunks = rag_svc.answer_question(user_id, question, start_date, end_date)
+        answer, chunks = rag_svc.answer_question(
+            current_user.id,
+            question,
+            start_date,
+            end_date,
+        )
         #answer, chunks = rag_svc.answer_question(user_id, question)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

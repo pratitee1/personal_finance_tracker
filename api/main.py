@@ -1,8 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
-from db.setup import SessionLocal
-from db.models.user import User
+from api.routes import auth
 from api.routes import upload_receipt
 from api.routes import rag_qa
 
@@ -23,15 +22,6 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Status code: {response.status_code}")
     return response
 
+app.include_router(auth.router, prefix="/auth")
 app.include_router(upload_receipt.router, prefix="/upload")
 app.include_router(rag_qa.router, prefix="/rag")
-
-@app.on_event("startup")
-def on_startup():
-    db = SessionLocal()
-    try:
-        if not db.query(User).filter(User.id == 1).first():
-            db.add(User(id=1, name="Default User", email="default@example.com"))
-            db.commit()
-    finally:
-        db.close()
